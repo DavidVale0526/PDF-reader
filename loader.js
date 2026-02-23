@@ -39,10 +39,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'pdf_bridge_name': fileName 
             });
             
-            statusText.innerText = "¡PDF listo! Redirigiendo a Netlify...";
+            // Validamos si hay conexión a Internet
+            let viewerUrl = "";
+            if (navigator.onLine) {
+                 statusText.innerText = "¡PDF listo! Redirigiendo a Netlify...";
+                 viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
+            } else {
+                 statusText.innerText = "¡PDF descargado! (Modo Offline Activado)";
+                 viewerUrl = chrome.runtime.getURL('web/viewer.html') + "?file=localBridge";
+            }
             
-            // Reemplazamos esta ventana de carga con nuestro Visor Final en Netlify
-            const viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
+            // Reemplazamos esta ventana de carga con nuestro Visor Final
             window.location.replace(viewerUrl);
         };
         

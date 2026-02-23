@@ -29,12 +29,18 @@ document.getElementById('pdfUpload').addEventListener('change', async (event) =>
             // Puesto que mencionas que usarás un método para que la URL sea HTTPS, 
             // esta URL debe ajustarse al destino final de tu HTTPS si lo vas a abrir automáticamente.
             
-            // Enlace al visor en HTTPS desplegado en Netlify
-            const viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
+            // Validamos si hay conexión a Internet
+            let viewerUrl = "";
+            if (navigator.onLine) {
+                 viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
+            } else {
+                 console.log("No hay conexión a Internet. Usando visor PDF empaquetado localmente.");
+                 viewerUrl = chrome.runtime.getURL('web/viewer.html') + "?file=localBridge";
+            }
             
             await chrome.tabs.create({ url: viewerUrl });
             
-            statusEl.innerText = "¡Visualizador abierto exitosamente!";
+            statusEl.innerText = navigator.onLine ? "¡Visualizador online abierto!" : "¡Visualizador Offline activado!";
             
             // Cerrar el popup después de 1 segundo de éxito
             setTimeout(() => window.close(), 1000);
