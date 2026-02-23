@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "PDF.js Local Bridge",
+  "version": "1.0",
+  "description": "Puente para abrir PDFs locales usando el visor PDF.js mediante extensiones.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Abrir PDF"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://reader01.netlify.app/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://reader01.netlify.app/web/viewer.html*"
+      ],
+      "js": [
+        "content_bridge.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "web/*",
+        "build/*",
+        "injector.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
