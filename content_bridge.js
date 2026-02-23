@@ -24,8 +24,10 @@ if (urlParams.get("file") === "localBridge") {
                   pdfName: result.pdf_bridge_name
               }, "*");
               
-              // Limpiamos los datos de storage para ahorrar espacio
-              chrome.storage.local.remove(['pdf_bridge_data', 'pdf_bridge_name']);
+              // [MODIFICADO]: Ya NO borramos los datos de storage.
+              // De esta manera habilitamos la "Persistencia Local", permitiendo que el visor recargue la página F5 
+              // sin perder el archivo, ya que volverá a sacarlo de aquí.
+              // chrome.storage.local.remove(['pdf_bridge_data', 'pdf_bridge_name']);
           }, 100);
           
       } else {
