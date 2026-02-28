@@ -40,13 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             
             // Validamos si hay conexión a Internet
-            let viewerUrl = "";
+            // ACTUALIZACIÓN PWA: Ahora SIEMPRE apuntamos a Netlify. 
+            // Si el usuario está offline, el Service Worker de Netlify interceptará la petición.
+            let viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
+            
             if (navigator.onLine) {
                  statusText.innerText = "¡PDF listo! Redirigiendo a Netlify...";
-                 viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
             } else {
-                 statusText.innerText = "¡PDF descargado! (Modo Offline Activado)";
-                 viewerUrl = chrome.runtime.getURL('web/viewer.html') + "?file=localBridge";
+                 statusText.innerText = "¡PDF descargado! Redirigiendo a Netlify (Caché Offline)...";
             }
             
             // Reemplazamos esta ventana de carga con nuestro Visor Final

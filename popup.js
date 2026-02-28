@@ -30,17 +30,14 @@ document.getElementById('pdfUpload').addEventListener('change', async (event) =>
             // esta URL debe ajustarse al destino final de tu HTTPS si lo vas a abrir automáticamente.
             
             // Validamos si hay conexión a Internet
-            let viewerUrl = "";
-            if (navigator.onLine) {
-                 viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
-            } else {
-                 console.log("No hay conexión a Internet. Usando visor PDF empaquetado localmente.");
-                 viewerUrl = chrome.runtime.getURL('web/viewer.html') + "?file=localBridge";
-            }
+            // ACTUALIZACIÓN PWA: Ahora SIEMPRE apuntamos a Netlify. 
+            // Si el usuario está offline, el Service Worker de Netlify interceptará 
+            // la petición y cargará la página desde el caché.
+            const viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
             
             await chrome.tabs.create({ url: viewerUrl });
             
-            statusEl.innerText = navigator.onLine ? "¡Visualizador online abierto!" : "¡Visualizador Offline activado!";
+            statusEl.innerText = navigator.onLine ? "¡Visualizador PWA abierto!" : "¡Visualizador PWA (Caché Offline) activado!";
             
             // Cerrar el popup después de 1 segundo de éxito
             setTimeout(() => window.close(), 1000);

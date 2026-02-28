@@ -1,0 +1,10 @@
+{
+    "name": "Local PDF Reader PWA",
+    "short_name": "PDF Reader",
+    "start_url": "/web/viewer.html",
+    "display": "standalone",
+    "background_color": "#2c2c2c",
+    "theme_color": "#2c2c2c",
+    "description": "Un potente visor PDF offline que funciona localmente.",
+    "icons": []
+}
