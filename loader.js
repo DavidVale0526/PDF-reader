@@ -18,13 +18,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // En extension chrome fetch desde una pagina empaquetada (<all_urls> grant) bypassea CORS
         console.log("Iniciando fetch hacia:", targetUrl);
-        const response = await fetch(targetUrl);
+        // Incluir credenciales para permitir la descarga de PDFs protegidos/autenticados que usen cookies
+        const response = await fetch(targetUrl, { credentials: 'include' });
         
         if (!response.ok) {
             throw new Error(`Servidor denegó la descarga: Error ${response.status} ${response.statusText}`);
         }
 
         const blob = await response.blob();
+        
+        // Detectar si la respuesta es HTML (página web, posiblemente un error o inicio de sesión)
+        if (blob.type.includes("text/html")) {
+            throw new Error("El servidor devolvió una página web, posiblemente porque el PDF o la página requiere una sesión activa, está protegido o el enlace ha caducado. Intenta abrirlo en una ventana normal primero.");
+        }
+
         if (blob.type !== "application/pdf" && !fileName.endsWith('.pdf')) {
              console.warn("La respuesta no tiene Type PDF explícito, pero procederemos de todas formas.");
         }
