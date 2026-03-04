@@ -3,9 +3,17 @@
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get("file") === "localBridge") {
   console.log("[Bridge] Detectado parámetro localBridge, inyectando content script...");
+
+  const docId = urlParams.get("id");
+  const dataKey = docId ? `pdf_bridge_data_${docId}` : 'pdf_bridge_data';
+  const nameKey = docId ? `pdf_bridge_name_${docId}` : 'pdf_bridge_name';
+
   // Extraer el archivo PDF del storage de Chrome
-  chrome.storage.local.get(['pdf_bridge_data', 'pdf_bridge_name'], (result) => {
-      if (result.pdf_bridge_data) {
+  chrome.storage.local.get([dataKey, nameKey], (result) => {
+      const pdfData = result[dataKey];
+      const pdfName = result[nameKey];
+
+      if (pdfData) {
           console.log("[Bridge] PDF interceptado de chrome.storage exitosamente.");
           // Inyectamos un script directamente al DOM principal (Main World)
           // Ya que el content script corre en un ambiente aislado (Isolated World)
@@ -20,18 +28,18 @@ if (urlParams.get("file") === "localBridge") {
               console.log("[Bridge] Emitiendo postMessage al visor de Netlify...");
               window.postMessage({
                   type: "INJECT_PDF_BRIDGE",
-                  pdfData: result.pdf_bridge_data,
-                  pdfName: result.pdf_bridge_name
+                  pdfData: pdfData,
+                  pdfName: pdfName
               }, "*");
               
               // [MODIFICADO]: Ya NO borramos los datos de storage.
               // De esta manera habilitamos la "Persistencia Local", permitiendo que el visor recargue la página F5 
               // sin perder el archivo, ya que volverá a sacarlo de aquí.
-              // chrome.storage.local.remove(['pdf_bridge_data', 'pdf_bridge_name']);
+              // chrome.storage.local.remove([dataKey, nameKey]);
           }, 100);
           
       } else {
-        console.error("[Bridge] No se encontró 'pdf_bridge_data' en storage.");
+        console.error(`[Bridge] No se encontró '${dataKey}' en storage.`);
       }
   });
 }

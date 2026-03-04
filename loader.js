@@ -40,16 +40,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         reader.onloadend = async function(e) {
             const base64Data = e.target.result;
             
-            // Guardamos el PDF usando exactamente el mismo puente que popup.js
+            const uniqueId = Date.now().toString();
+            await cleanupOldPdfs();
+
+            // Guardamos el PDF usando el ID temporal para evitar la sobrescritura de otra pestaña
+            const dataKey = `pdf_bridge_data_${uniqueId}`;
+            const nameKey = `pdf_bridge_name_${uniqueId}`;
+
             await chrome.storage.local.set({ 
-                'pdf_bridge_data': base64Data, 
-                'pdf_bridge_name': fileName 
+                [dataKey]: base64Data, 
+                [nameKey]: fileName 
             });
             
             // Validamos si hay conexión a Internet
             // ACTUALIZACIÓN PWA: Ahora SIEMPRE apuntamos a Netlify. 
             // Si el usuario está offline, el Service Worker de Netlify interceptará la petición.
-            let viewerUrl = "https://reader01.netlify.app/web/viewer.html?file=localBridge";
+            let viewerUrl = `https://reader01.netlify.app/web/viewer.html?file=localBridge&id=${uniqueId}`;
             
             if (navigator.onLine) {
                  statusText.innerText = "¡PDF listo! Redirigiendo a Netlify...";
@@ -79,3 +85,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorMsg.style.display = 'block';
     }
 });
+
+async function cleanupOldPdfs() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(null, (items) => {
+            const pdfKeys = Object.keys(items)
+                .filter(key => key.startsWith('pdf_bridge_data_'))
+                .map(key => ({
+                    key: key,
+                    nameKey: key.replace('data', 'name'),
+                    time: parseInt(key.split('_').pop(), 10) || 0
+                }))
+                .sort((a, b) => b.time - a.time);
+
+            if (pdfKeys.length > 5) {
+                const keysToRemove = [];
+                for (let i = 5; i < pdfKeys.length; i++) {
+                    keysToRemove.push(pdfKeys[i].key);
+                    keysToRemove.push(pdfKeys[i].nameKey);
+                }
+                chrome.storage.local.remove(keysToRemove, resolve);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
