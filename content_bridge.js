@@ -21,6 +21,28 @@ if (urlParams.get("file") === "localBridge") {
           const script = document.createElement('script');
           script.src = chrome.runtime.getURL("injector.js");
           document.documentElement.appendChild(script);
+
+          // Inyectamos el traductor MVC secuencialmente
+          const loadScript = (src) => {
+              return new Promise(resolve => {
+                  const s = document.createElement('script');
+                  s.src = chrome.runtime.getURL(src);
+                  s.onload = resolve;
+                  document.documentElement.appendChild(s);
+              });
+          };
+
+          const cssLink = document.createElement('link');
+          cssLink.rel = 'stylesheet';
+          cssLink.href = chrome.runtime.getURL('translator/styles.css');
+          document.head.appendChild(cssLink);
+
+          (async () => {
+              await loadScript('translator/model.js');
+              await loadScript('translator/view.js');
+              await loadScript('translator/controller.js');
+              console.log("[Bridge] MVC Traductor inyectado.");
+          })();
           
           // Enviamos los binarios desde el Isolated World -> Main World Front-End
           // Agregamos un pequeñísimo delay para que el script inyectado alcance a registrar el listener de mensajes

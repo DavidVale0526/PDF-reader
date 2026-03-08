@@ -35,7 +35,8 @@
       "resources": [
         "web/*",
         "build/*",
-        "injector.js"
+        "injector.js",
+        "translator/*"
       ],
       "matches": [
         "<all_urls>"
