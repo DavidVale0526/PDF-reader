@@ -36,7 +36,8 @@
         "web/*",
         "build/*",
         "injector.js",
-        "translator/*"
+        "translator/*",
+        "liquid_mode/*"
       ],
       "matches": [
         "<all_urls>"
