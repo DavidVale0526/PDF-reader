@@ -1,10 +1,40 @@
+/**
+ * Extrae la URL del PDF del query string de forma robusta.
+ *
+ * Dos fuentes posibles con formatos distintos:
+ *  - declarativeNetRequest (DNR): URL cruda, sin codificar.
+ *    Ej: ?target=https://example.com/doc.pdf?v=1
+ *  - webNavigation fallback: URL con encodeURIComponent.
+ *    Ej: ?target=https%3A%2F%2Fexample.com%2Fdoc.pdf%3Fv%3D1
+ *
+ * Solución: leer todo lo que hay después de "target=" (para no romper con
+ * '&' sin codificar en la URL cruda) y luego intentar decodificar.
+ * decodeURIComponent es idempotente en strings sin secuencias %XX, por lo
+ * que funciona correctamente en ambos casos.
+ *
+ * @param {string} search - window.location.search
+ * @returns {string|null}
+ */
+function extractTargetUrl(search) {
+    const targetIndex = search.indexOf('target=');
+    if (targetIndex < 0) return null;
+
+    // Tomamos todo desde 'target=' hacia adelante para preservar '&' crudos
+    const rawValue = search.substring(targetIndex + 7);
+    try {
+        return decodeURIComponent(rawValue);
+    } catch {
+        // Si la decodificación falla (% mal formado), usar el valor crudo
+        return rawValue;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const statusText = document.getElementById('status-text');
     const errorMsg = document.getElementById('error-msg');
     const spinner = document.getElementById('spinner');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetUrl = urlParams.get('target');
+    const targetUrl = extractTargetUrl(window.location.search);
 
     if (!targetUrl) {
         showError("No se especificó ningún PDF para cargar.");

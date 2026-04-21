@@ -42,6 +42,11 @@ if (urlParams.get("file") === "localBridge") {
           liquidCssLink.href = chrome.runtime.getURL('liquid_mode/styles.css');
           document.head.appendChild(liquidCssLink);
 
+          const readAloudCssLink = document.createElement('link');
+          readAloudCssLink.rel = 'stylesheet';
+          readAloudCssLink.href = chrome.runtime.getURL('read_aloud/styles.css');
+          document.head.appendChild(readAloudCssLink);
+
           (async () => {
               // Inyectar Traductor
               await loadScript('translator/model.js');
@@ -54,6 +59,12 @@ if (urlParams.get("file") === "localBridge") {
               await loadScript('liquid_mode/view.js');
               await loadScript('liquid_mode/controller.js');
               console.log("[Bridge] MVC Liquid Mode inyectado.");
+
+              // Inyectar Lector de Voz (Read Aloud)
+              await loadScript('read_aloud/model.js');
+              await loadScript('read_aloud/view.js');
+              await loadScript('read_aloud/controller.js');
+              console.log("[Bridge] MVC Read Aloud inyectado.");
           })();
           
           // Enviamos los binarios desde el Isolated World -> Main World Front-End

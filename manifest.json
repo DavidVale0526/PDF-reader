@@ -11,7 +11,8 @@
     "storage",
     "unlimitedStorage",
     "tabs",
-    "webNavigation"
+    "webNavigation",
+    "declarativeNetRequest"
   ],
   "background": {
     "service_worker": "background.js"
@@ -37,7 +38,8 @@
         "build/*",
         "injector.js",
         "translator/*",
-        "liquid_mode/*"
+        "liquid_mode/*",
+        "read_aloud/*"
       ],
       "matches": [
         "<all_urls>"

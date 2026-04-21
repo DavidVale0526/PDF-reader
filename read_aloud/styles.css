@@ -1,0 +1,125 @@
+.read-aloud-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    z-index: 10000;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.read-aloud-header {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: 600;
+    color: #333;
+}
+
+.read-aloud-close-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #888;
+}
+
+.read-aloud-close-btn:hover {
+    color: #333;
+}
+
+.read-aloud-settings {
+    padding: 12px 16px 4px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.read-aloud-voice-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: #f9fafb;
+    outline: none;
+    transition: border-color 0.2s;
+    cursor: pointer;
+}
+
+.read-aloud-voice-select:focus {
+    border-color: #4f46e5;
+}
+
+.read-aloud-controls {
+    padding: 12px 16px 16px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.read-aloud-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.read-aloud-btn:active {
+    transform: scale(0.95);
+}
+
+.play-btn {
+    background: #4f46e5;
+    color: white;
+}
+
+.play-btn:hover {
+    background: #4338ca;
+}
+
+.stop-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.stop-btn:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.stop-btn:disabled {
+    background: #fca5a5;
+    cursor: not-allowed;
+}
+
+.read-aloud-toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+}
+
+.read-aloud-toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.read-aloud-toolbar-btn span {
+    font-size: 16px;
+}
