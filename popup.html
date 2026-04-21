@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Subir PDF</title>
+    <title>Lector PDF Bridge</title>
     <style>
         body {
             font-family: 'Inter', system-ui, sans-serif;
@@ -15,19 +15,46 @@
             box-sizing: border-box;
         }
 
-        h2 {
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 8px;
-            color: #1a1a1a;
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
         }
 
-        p {
-            font-size: 13px;
+        .header-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        h2 {
+            font-size: 16px;
+            margin: 0;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 12px;
             color: #6c757d;
-            margin-top: 0;
-            margin-bottom: 20px;
+            margin: 0 0 18px 0;
             line-height: 1.4;
+        }
+
+        /* ── Sección: modo upload ─────────────────────── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
         }
 
         .upload-btn-wrapper {
@@ -38,28 +65,35 @@
         }
 
         .btn {
-            border: 2px solid transparent;
+            border: none;
             color: white;
-            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-            padding: 12px 20px;
+            padding: 11px 20px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             width: 100%;
             cursor: pointer;
             text-align: center;
             box-sizing: border-box;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
         }
 
-        .btn:hover {
+        .btn-upload {
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            box-shadow: 0 3px 8px rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-upload:hover {
             background: linear-gradient(135deg, #0b5ed7, #0a58ca);
             transform: translateY(-1px);
-            box-shadow: 0 6px 8px rgba(13, 110, 253, 0.25);
+            box-shadow: 0 5px 10px rgba(13, 110, 253, 0.3);
         }
 
-        .btn:active {
+        .btn-upload:active {
             transform: translateY(1px);
             box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
         }
@@ -72,28 +106,81 @@
             opacity: 0;
             cursor: pointer;
             height: 100%;
+            width: 100%;
         }
 
+        /* ── Separador ────────────────────────────────── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #dee2e6;
+        }
+
+        .divider span {
+            font-size: 11px;
+            color: #adb5bd;
+            font-weight: 500;
+        }
+
+        /* ── Sección: modo directo (Android) ─────────── */
+        .btn-direct {
+            background: linear-gradient(135deg, #198754, #157347);
+            box-shadow: 0 3px 8px rgba(25, 135, 84, 0.25);
+        }
+
+        .btn-direct:hover {
+            background: linear-gradient(135deg, #157347, #146c43);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(25, 135, 84, 0.3);
+        }
+
+        .btn-direct:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(25, 135, 84, 0.2);
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 7px;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .hint strong {
+            color: #198754;
+        }
+
+        /* ── Mensajes de estado ───────────────────────── */
         #status {
-            margin-top: 15px;
-            font-size: 13px;
+            margin-top: 12px;
+            font-size: 12px;
             color: #198754;
             font-weight: 500;
             text-align: center;
             display: none;
-            padding: 8px;
+            padding: 7px 10px;
             background-color: #d1e7dd;
             border-radius: 6px;
         }
 
         #error-status {
-            margin-top: 15px;
-            font-size: 13px;
+            margin-top: 12px;
+            font-size: 12px;
             color: #dc3545;
             font-weight: 500;
             text-align: center;
             display: none;
-            padding: 8px;
+            padding: 7px 10px;
             background-color: #f8d7da;
             border-radius: 6px;
         }
@@ -101,13 +188,32 @@
 </head>
 
 <body>
-    <h2>Lector PDF Bridge</h2>
-    <p>Selecciona un archivo PDF de tu equipo para abrirlo con compatibilidad de extensiones.</p>
+    <div class="header">
+        <div class="header-icon">📄</div>
+        <h2>Lector PDF Bridge</h2>
+    </div>
+    <p class="subtitle">Abre PDFs locales o en línea con el visor avanzado.</p>
 
+    <!-- Modo 1: Subir archivo (flujo actual, desktop + Android) -->
+    <div class="section-label">Desde tu dispositivo</div>
     <div class="upload-btn-wrapper">
-        <button class="btn">Subir Archivo PDF</button>
+        <button class="btn btn-upload" id="btnUpload">
+            📂 Subir Archivo PDF
+        </button>
         <input type="file" id="pdfUpload" accept="application/pdf" />
     </div>
+
+    <div class="divider"><span>o</span></div>
+
+    <!-- Modo 2: Visor Directo (ideal para Android) -->
+    <div class="section-label">Modo visor directo</div>
+    <button class="btn btn-direct" id="btnOpenViewer">
+        📱 Abrir Visor
+    </button>
+    <p class="hint">
+        Abre el lector y usa <strong>"Abrir archivo"</strong> dentro del visor
+        para seleccionar tu PDF. Recomendado en Android.
+    </p>
 
     <div id="status">Procesando archivo...</div>
     <div id="error-status"></div>
