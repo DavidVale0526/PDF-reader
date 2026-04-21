@@ -29,7 +29,9 @@
         "injector.js",
         "translator/*",
         "liquid_mode/*",
-        "read_aloud/*"
+        "read_aloud/*",
+        "loader.html",
+        "loader.js"
       ],
       "matches": [
         "<all_urls>"

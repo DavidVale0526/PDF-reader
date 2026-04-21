@@ -30,50 +30,42 @@
  *   6. Inyecta también las extensiones (Traductor, Liquid Mode, Read Aloud)
  */
 
-// ─── Capa 1: declarativeNetRequest — Intercepción de links PDF ────────────────
-
-async function registerPdfInterceptRule() {
-    const loaderBase = `chrome-extension://${chrome.runtime.id}/loader.html`;
-    try {
-        await chrome.declarativeNetRequest.updateDynamicRules({
-            removeRuleIds: [1],
-            addRules: [{
-                id: 1,
-                priority: 100,
-                action: {
-                    type: "redirect",
-                    redirect: { regexSubstitution: `${loaderBase}?target=\\0` }
-                },
-                condition: {
-                    regexFilter: "^https?://.+\\.pdf(\\?.*)?$",
-                    resourceTypes: ["main_frame"]
-                }
-            }]
-        });
-        console.log("[DNR] Regla de intercepción de PDFs registrada.");
-    } catch (err) {
-        console.error("[DNR] Error al registrar la regla:", err);
-    }
-}
-
-chrome.runtime.onInstalled.addListener(registerPdfInterceptRule);
-chrome.runtime.onStartup.addListener(registerPdfInterceptRule);
-
-
-// ─── Capa 2: webNavigation fallback — Intercepción de links PDF ───────────────
+// ─── Capa 1: webNavigation (Primaria para Android/Lemur) ──────────────────────
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+    // Solo nos interesa el frame principal
     if (details.frameId !== 0) return;
+
     const url = details.url;
+
+    // Evitar bucles
     if (url.startsWith(chrome.runtime.getURL("loader.html"))) return;
 
-    const urlObj = new URL(url);
-    if (urlObj.pathname.toLowerCase().endsWith('.pdf')) {
-        console.log("[Fallback webNavigation] Interceptando PDF:", url);
-        const loaderUrl = chrome.runtime.getURL("loader.html")
-            + "?target=" + encodeURIComponent(url);
-        chrome.tabs.update(details.tabId, { url: loaderUrl });
+    try {
+        const urlObj = new URL(url);
+        // Detectar si es un PDF (ignorando parámetros de búsqueda)
+        if (urlObj.pathname.toLowerCase().endsWith('.pdf')) {
+            console.log("[Lemur Fix] Interceptando PDF vía tabs.update:", url);
+
+            const loaderUrl = chrome.runtime.getURL("loader.html")
+                + "?target=" + encodeURIComponent(url);
+
+            // tabs.update es más probable que sea permitido por Lemur que DNR
+            chrome.tabs.update(details.tabId, { url: loaderUrl });
+        }
+    } catch (e) {
+        // URL inválida, ignorar
     }
+});
+
+// Limpiar reglas DNR para que no causen el error de bloqueo
+chrome.runtime.onInstalled.addListener(async () => {
+    try {
+        await chrome.declarativeNetRequest.updateDynamicRules({
+            removeRuleIds: [1]
+        });
+        console.log("[Lemur Fix] Reglas DNR limpiadas.");
+    } catch (e) {}
 });
 
 
